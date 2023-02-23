@@ -1,57 +1,63 @@
-# Project Name
+# Azure Load Testing Plugins
 
-(short, 1-3 sentenced, description of the project)
+This document explains how to use the plugins designed for Azure services in Azure load testing or JMeter servers.
 
-## Features
+## Load Testing
 
-This project framework provides the following features:
+JMeter or JME is an open-source Java-based load testing framework that is
+easily extendible. The load test can be executed in GUI and non GUI mode. In GUI mode, JMeter needs to setup in a VM or local dev environment.
+In non-GUI mode, we pass all required components along with a JMX file and then the server will execute the load as per specified steps in JMX file.
 
-* Feature 1
-* Feature 2
-* ...
+### How to setup JMeter in GUI mode
 
-## Getting Started
+This setup instruction is only for Mac but JMeter can also easily be installed in Windows.
 
-### Prerequisites
+1. Install Microsoft build of OpenJDK from [here](https://www.microsoft.com/openjdk)
+1. Run `brew install jmeter` command to install JMeter package or download and install it from [Apache](https://jmeter.apache.org/download_jmeter.cgi).
+1. Run `jmeter` to load Jmeter GUI application for running load testing in local dev environment.
+1. Load JMX file and provide thread group and plugin configuration variables using GUI and run the test.
 
-(ideally very short, if any)
+### How to setup Visual Studio Code for Eventhub plugin development
 
-- OS
-- Library version
-- ...
+Follow the instruction below to setup local development environment for Eventhub plugin development:
 
-### Installation
+1. Install Maven extension for Java from Microsoft
+1. Use Maven extensions to build Jar file for Eventhub plugin.
+1. Edit plugin source code and compile the code using Maven.
+1. Manually copy the shaded Jar file (eventhubplugin-1.0.jar) to JMeter plugins folder located in `/opt/homebrew/Cellar/jmeter/5.5/libexec/lib`.
+1. Run `jmeter` locally and open and run JMX file same as before. JMX file has a reference to GUI class and sampler class resided in the JAR file.
+Note that this folder can be different based on brew and JMeter version.
 
-(ideally very short)
+### How to use plugin in GUI mode to design a JMX file
 
-- npm install [package name]
-- mvn install
-- ...
+In order to use the plugin, as mentioned in the previous section, the JAR file needs to be installed using plugin manager
+or manually coping the file to the JMeter plugin manager folder. If you copy the JAR file manually,
+you will need to add the following lines to your JMX file:
 
-### Quickstart
-(Add steps to get up and running quickly)
+```xml
+    <hashTree>
+        <com.microsoft.EventHubPlugin guiclass="com.microsoft.EventHubPluginGui" testclass="com.microsoft.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
+          <stringProp name="eventHubConnectionVarName">EventHubConnectionString</stringProp>
+          <stringProp name="eventHubName">telemetry-data-changed-eh</stringProp>
+          <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
+        </com.microsoft.EventHubPlugin>
+    <hashTree/>
+```
 
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
+After adding the line above to the JMX file, open in JMX GUI and edit the variables and define all required steps for your load testing and
+add any other JMeter plug as needed.
 
+This plugin has three variables as below:
 
-## Demo
+1. eventHubConnectionVarName: to specify the connection string variable name for event hub that can passed to
+the plugin using environmental variable or as Key Vault,
+1. eventHubName: event hub name in the event hub name space
+1. liquidTemplateFileName: location of a liquid template file which will be used by plugin to render the content of a payload to send to event hub
+([more about liquid template](https://shopify.github.io/liquid/)). 
+Here is an example of [a JMX](/samples/eventhubplugin/LoadTest.jmx) 
+and [a liquid template](/samples/eventhubplugin/StreamingDataTemplate.liquid) files.
 
-A demo app is included to show how to use the project.
+### How to use Eventhub plugin in Azure Load Testing
 
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+After completing the JMX file and testing it using in GUI mode, upload the JMX file along with JAR file and the liquid template to Azure load test and
+then follow the steps provided [here](https://learn.microsoft.com/en-us/azure/load-testing/quickstart-create-and-run-load-test) to setup Azure load testing.

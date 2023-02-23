@@ -1,0 +1,28 @@
+{
+	"no-trailing-punctuation": false,
+	"line-length": true,
+	"ol-prefix": {
+		"style": "one"
+	},
+	"MD004": {
+		"style": "dash"
+	},
+	"MD013": {
+		"line_length": 150,
+		"code_blocks": false,
+		"tables": false
+	},
+	"MD024": {
+		"siblings_only": true
+	},
+	"MD033": {
+		"allowed_elements": [
+			"details",
+			"figure",
+			"figcaption",
+			"i",
+			"img",
+			"summary"
+		]
+	}
+}
