@@ -1,13 +1,6 @@
-## [project-title] Changelog
+## Azure Load Testing Plugins Changelog
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+# 1.0.0 (2023-02-23)
 
 *Features*
-* ...
-
-*Bug Fixes*
-* ...
-
-*Breaking Changes*
-* ...
+* Eventhub plugin v1.0 that be used to render a predefined liquid template to construct a event data payload
