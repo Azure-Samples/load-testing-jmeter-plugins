@@ -31,7 +31,7 @@ Note that this folder can be different based on brew and JMeter version.
 ### How to use plugin in GUI mode to design a JMX file
 
 In order to use the plugin, as mentioned in the previous section, the JAR file needs to be installed using plugin manager
-or manually coping the file to the JMeter plugin manager folder. If you copy the JAR file manually,
+or manually copy the file to the JMeter plugin manager folder. If you copy the JAR file manually,
 you will need to add the following lines to your JMX file:
 
 ```xml
