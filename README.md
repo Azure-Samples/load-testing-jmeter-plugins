@@ -53,8 +53,8 @@ This plugin has three variables as below:
 the plugin using environmental variable or as Key Vault,
 1. eventHubName: event hub name in the event hub name space
 1. liquidTemplateFileName: location of a liquid template file which will be used by plugin to render the content of a payload to send to event hub
-([more about liquid template](https://shopify.github.io/liquid/)). 
-Here is an example of [a JMX](/samples/eventhubplugin/LoadTest.jmx) 
+([more about liquid template](https://shopify.github.io/liquid/)).
+Here is an example of [a JMX](/samples/eventhubplugin/LoadTest.jmx)
 and [a liquid template](/samples/eventhubplugin/StreamingDataTemplate.liquid) files.
 
 ### How to use Eventhub plugin in Azure Load Testing
