@@ -24,7 +24,7 @@ Follow the instruction below to setup local development environment for Eventhub
 1. Install Maven extension for Java from Microsoft
 1. Use Maven extensions to build Jar file for Eventhub plugin.
 1. Edit plugin source code and compile the code using Maven.
-1. Manually copy the shaded Jar file (eventhubplugin-1.0.jar) to JMeter plugins folder located in `/opt/homebrew/Cellar/jmeter/5.5/libexec/lib`.
+1. Manually copy the shaded Jar file (loadtestplugins-1.0.jar) to JMeter plugins folder located in `/opt/homebrew/Cellar/jmeter/5.5/libexec/lib`.
 1. Run `jmeter` locally and open and run JMX file same as before. JMX file has a reference to GUI class and sampler class resided in the JAR file.
 Note that this folder can be different based on brew and JMeter version.
 
