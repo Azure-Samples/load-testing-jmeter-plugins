@@ -21,7 +21,7 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
     private JPanel panel;
     private JLabeledTextField eventHubConnectionStringVarName;
     private JLabeledTextField eventHubName;
-    private JLabeledTextField liqidTemplateFileName;
+    private JLabeledTextField liquidTemplateFileName;
 
     public EventHubPluginGui() {
         init();
@@ -33,7 +33,7 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
         eventHubConnectionStringVarName
                 .setText(element.getPropertyAsString(EventHubPlugin.EVENT_HUB_CONNECTION_VAR_NAME));
         eventHubName.setText(element.getPropertyAsString(EventHubPlugin.EVENT_HUB_NAME));
-        liqidTemplateFileName.setText(element.getPropertyAsString(EventHubPlugin.LIQUID_TEMPLATE_FILENAME));
+        liquidTemplateFileName.setText(element.getPropertyAsString(EventHubPlugin.LIQUID_TEMPLATE_FILENAME));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
         super.configureTestElement(sampler);
         sampler.setProperty(EventHubPlugin.EVENT_HUB_CONNECTION_VAR_NAME, eventHubConnectionStringVarName.getText());
         sampler.setProperty(EventHubPlugin.EVENT_HUB_NAME, eventHubName.getText());
-        sampler.setProperty(EventHubPlugin.LIQUID_TEMPLATE_FILENAME, liqidTemplateFileName.getText());
+        sampler.setProperty(EventHubPlugin.LIQUID_TEMPLATE_FILENAME, liquidTemplateFileName.getText());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
 
         eventHubConnectionStringVarName.setText("");
         eventHubName.setText("");
-        liqidTemplateFileName.setText("");
+        liquidTemplateFileName.setText("");
     }
 
     @Override
@@ -90,12 +90,12 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
         return panel;
     }
 
-    private JPanel createLiqidTemplateFileNamePanel() {
-        liqidTemplateFileName = new JLabeledTextField("Liqid Template File Name:");
-        liqidTemplateFileName.setName(EventHubPlugin.LIQUID_TEMPLATE_FILENAME);
+    private JPanel createliquidTemplateFileNamePanel() {
+        liquidTemplateFileName = new JLabeledTextField("Liquid Template File Name:");
+        liquidTemplateFileName.setName(EventHubPlugin.LIQUID_TEMPLATE_FILENAME);
 
         JPanel panel = new JPanel(new BorderLayout(5, 0));
-        panel.add(liqidTemplateFileName);
+        panel.add(liquidTemplateFileName);
 
         return panel;
     }
@@ -110,7 +110,7 @@ public class EventHubPluginGui extends AbstractSamplerGui implements ChangeListe
         eventHubsConfigPanel.setBorder(BorderFactory.createTitledBorder("Event Hubs Configuration"));
         eventHubsConfigPanel.add(createEventHubConnectionStringVarNamePanel());
         eventHubsConfigPanel.add(createEventHubNamePanel());
-        eventHubsConfigPanel.add(createLiqidTemplateFileNamePanel());
+        eventHubsConfigPanel.add(createliquidTemplateFileNamePanel());
         mainPanel.add(eventHubsConfigPanel, BorderLayout.NORTH);
 
         add(mainPanel, BorderLayout.CENTER);
