@@ -26,11 +26,11 @@
         <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
       </ThreadGroup>
       <hashTree>
-        <com.microsoft.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
+        <com.microsoft.eventhubplugin.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
           <stringProp name="eventHubConnectionVarName">EventHubConnectionString</stringProp>
           <stringProp name="eventHubName">telemetry-data-changed-eh</stringProp>
           <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
-        </com.microsoft.EventHubPlugin>
+        </com.microsoft.eventhubplugin.EventHubPlugin>
         <hashTree/>
         <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer" enabled="true">
           <stringProp name="ConstantTimer.delay">5000</stringProp>

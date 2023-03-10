@@ -36,11 +36,11 @@ you will need to add the following lines to your JMX file:
 
 ```xml
     <hashTree>
-        <com.microsoft.EventHubPlugin guiclass="com.microsoft.EventHubPluginGui" testclass="com.microsoft.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
+        <com.microsoft.eventhubplugin.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
           <stringProp name="eventHubConnectionVarName">EventHubConnectionString</stringProp>
           <stringProp name="eventHubName">telemetry-data-changed-eh</stringProp>
           <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
-        </com.microsoft.EventHubPlugin>
+        </com.microsoft.eventhubplugin.EventHubPlugin>
     <hashTree/>
 ```
 
