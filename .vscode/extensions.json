@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "hashicorp.terraform",
+    "vscjava.vscode-maven",
+    "ms-vscode-remote.remote-containers"
+  ]
+}
