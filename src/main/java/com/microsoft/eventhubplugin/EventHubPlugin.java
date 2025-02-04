@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import com.azure.messaging.eventhubs.*;
 import com.azure.messaging.eventhubs.models.CreateBatchOptions;
 import com.azure.core.amqp.exception.*;
+import com.azure.identity.DefaultAzureCredentialBuilder;
+import com.azure.identity.ManagedIdentityCredential;
+import com.azure.identity.ManagedIdentityCredentialBuilder;
 
 public class EventHubPlugin extends AbstractSampler implements TestStateListener {
 
@@ -92,12 +95,33 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
             String connectionStringVarName = getEventHubConnectionVarName();
             requestBody = "EventHub Connection String Var Name: ".concat(connectionStringVarName);
 
+            //System.setProperty("http.nonProxyHosts", "169.254.169.254");
+            log.error("calling System.getenv");
             final String connectionString = System.getenv(connectionStringVarName);
 
-            requestBody = requestBody.concat("\n")
+            if (connectionString == null) {
+                // Use managed identity
+                requestBody = requestBody.concat("\n")
+                    .concat("EventHub Connection String: ").concat("Using Managed Identity");
+
+                //producerBuilder.fullyQualifiedNamespace("archdocjmeterloader.servicebus.windows.net");
+                //producerBuilder.eventHubName(getEventHubName());
+                log.error("calling managed identity ");
+                // producerBuilder.credential(new ManagedIdentityCredentialBuilder()
+                //                                     //.resourceId("/subscriptions/88e95096-b275-4fb0-be07-a309aa0e98f1/resourceGroups/rg-arch-doc-jmeter-loader/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jmeter-loader-managed-identity")
+                //                                     .clientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301")
+                //                                     .build());
+                producerBuilder.credential("archdocjmeterloader.servicebus.windows.net",
+                    getEventHubName(),
+                    new DefaultAzureCredentialBuilder().build());
+                //producerBuilder.credential(new DefaultAzureCredentialBuilder().managedIdentityClientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301").build());
+                log.error("called managed identity ");
+            } else {
+                requestBody = requestBody.concat("\n")
                     .concat("EventHub Connection String: ").concat(connectionString);
 
-            producerBuilder = producerBuilder.connectionString(connectionString, getEventHubName());
+                producerBuilder = producerBuilder.connectionString(connectionString, getEventHubName());
+            }
 
             producer = producerBuilder.buildProducerClient();
 
@@ -121,7 +145,7 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
 
             res.sampleStart(); // Start timing
             // send the batch of events to the event hub
-            producer.send(batch);
+            //.send(batch);
 
             sentBytes = batch.getSizeInBytes();
             res.latencyEnd();
@@ -142,7 +166,7 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
         } catch (Exception ex) {
             res.setResponseData(ex.toString(), "UTF-8");
             responseMessage = ex.getMessage();
-            log.info("Error calling {} sampler. ", threadName, ex);
+            log.error("Error calling {} sampler. ", threadName, ex);
         } finally {
             if (producer != null) {
                 producer.close();

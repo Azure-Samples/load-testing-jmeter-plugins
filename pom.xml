@@ -64,6 +64,21 @@
             <version>5.15.0</version>
         </dependency>
         <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>msal4j</artifactId>
+            <version>1.11.0</version>
+        </dependency>
+        <!-- <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core</artifactId>
+            <version>1.31.0</version>
+        </dependency> -->
+        <dependency>
             <groupId>nl.big-o</groupId>
             <artifactId>liqp</artifactId>
             <version>0.8.3.3</version>
@@ -98,11 +113,13 @@
                     <artifactSet>
                         <includes>
                             <include>com.azure:azure-messaging-eventhubs</include>
+                            <include>com.azure:azure-identity</include>
                             <include>com.azure:azure-core-amqp</include>
+                            <include>com.azure:azure-core</include>
+                            <include>com.microsoft.azure:msal4j</include>
                             <include>org.apache.qpid:proton-j</include>
                             <include>nl.big-o:liqp</include>
                             <include>org.antlr:antlr4-runtime</include>
-                            <include>com.azure:azure-core</include>
                             <include>io.projectreactor:reactor-core</include>
                             <include>com.fasterxml.jackson.core:jackson-core</include>
                             <include>com.fasterxml.jackson.core:jackson-databind</include>
