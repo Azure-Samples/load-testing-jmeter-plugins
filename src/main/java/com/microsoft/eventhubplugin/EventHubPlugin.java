@@ -28,7 +28,9 @@ import com.azure.identity.ManagedIdentityCredentialBuilder;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 //import com.microsoft.azure.sdk.iot.service.*;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
-import com.microsoft.azure.sdk.iot.device.Message;
+import com.microsoft.azure.sdk.iot.service.Message;
+import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
+import com.microsoft.azure.sdk.iot.service.ServiceClient;
 
 import retrofit2.http.HTTP;
 
@@ -98,18 +100,15 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
         long sentBytes = 0;
 
         try {
-            String connString = "<Device ConnString>";
-            IotHubClientProtocol protocol = IotHubClientProtocol.HTTPS;
-            try (DeviceClient client = new DeviceClient(connString, protocol)) {
+            String connString = "<Conn String>";
+            IotHubServiceClientProtocol protocol = IotHubServiceClientProtocol.AMQPS;
+            ServiceClient client = new ServiceClient(connString, protocol);
                 client.open();
 
                 Message message = new Message("Your message here");
-                client.sendEventAsync(message, (responseStatus, callbackContext) -> {
-                    log.error("Message sent with status: " + responseStatus.name());
-                }, null);
+                client.send("ofimbres-jmeter-test-device", message);
 
                 client.close();
-            }
 
             int msgCount = 1;
             String liquidFileName = getLiquidTemplateFileName();
