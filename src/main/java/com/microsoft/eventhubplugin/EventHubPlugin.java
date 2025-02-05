@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
 import java.util.HashSet;
 
+import org.apache.bcel.generic.RETURN;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.samplers.AbstractSampler;
 import org.apache.jmeter.samplers.Entry;
@@ -23,6 +24,14 @@ import com.azure.core.amqp.exception.*;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.identity.ManagedIdentityCredential;
 import com.azure.identity.ManagedIdentityCredentialBuilder;
+
+import com.microsoft.azure.sdk.iot.device.DeviceClient;
+//import com.microsoft.azure.sdk.iot.service.*;
+import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
+import com.microsoft.azure.sdk.iot.device.Message;
+
+import retrofit2.http.HTTP;
+
 
 public class EventHubPlugin extends AbstractSampler implements TestStateListener {
 
@@ -88,46 +97,20 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
         long bytes = 0;
         long sentBytes = 0;
 
-        EventHubProducerClient producer = null;
-        EventHubClientBuilder producerBuilder = new EventHubClientBuilder();
-
         try {
-            String connectionStringVarName = getEventHubConnectionVarName();
-            requestBody = "EventHub Connection String Var Name: ".concat(connectionStringVarName);
+            String connString = "<Device ConnString>";
+            IotHubClientProtocol protocol = IotHubClientProtocol.HTTPS;
+            try (DeviceClient client = new DeviceClient(connString, protocol)) {
+                client.open();
 
-            //System.setProperty("http.nonProxyHosts", "169.254.169.254");
-            log.error("calling System.getenv");
-            final String connectionString = System.getenv(connectionStringVarName);
+                Message message = new Message("Your message here");
+                client.sendEventAsync(message, (responseStatus, callbackContext) -> {
+                    log.error("Message sent with status: " + responseStatus.name());
+                }, null);
 
-            if (connectionString == null) {
-                // Use managed identity
-                requestBody = requestBody.concat("\n")
-                    .concat("EventHub Connection String: ").concat("Using Managed Identity");
-
-                //producerBuilder.fullyQualifiedNamespace("archdocjmeterloader.servicebus.windows.net");
-                //producerBuilder.eventHubName(getEventHubName());
-                log.error("calling managed identity ");
-                // producerBuilder.credential(new ManagedIdentityCredentialBuilder()
-                //                                     //.resourceId("/subscriptions/88e95096-b275-4fb0-be07-a309aa0e98f1/resourceGroups/rg-arch-doc-jmeter-loader/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jmeter-loader-managed-identity")
-                //                                     .clientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301")
-                //                                     .build());
-                producerBuilder.credential("archdocjmeterloader.servicebus.windows.net",
-                    getEventHubName(),
-                    new DefaultAzureCredentialBuilder().build());
-                //producerBuilder.credential(new DefaultAzureCredentialBuilder().managedIdentityClientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301").build());
-                log.error("called managed identity ");
-            } else {
-                requestBody = requestBody.concat("\n")
-                    .concat("EventHub Connection String: ").concat(connectionString);
-
-                producerBuilder = producerBuilder.connectionString(connectionString, getEventHubName());
+                client.close();
             }
 
-            producer = producerBuilder.buildProducerClient();
-
-            // prepare a batch of events to send to the event hub
-            CreateBatchOptions batchOptions = new CreateBatchOptions();
-            EventDataBatch batch = producer.createBatch(batchOptions);
             int msgCount = 1;
             String liquidFileName = getLiquidTemplateFileName();
             requestBody = requestBody.concat("\n")
@@ -137,17 +120,8 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
             requestBody = requestBody.concat("\n\n")
                     .concat("[Event data #").concat(String.valueOf(msgCount)).concat("]\n")
                     .concat("Body: ").concat(msg);
-            EventData eventData = new EventData(msg);
-
-            batch.tryAdd(eventData);
-
-            bytes = batch.getSizeInBytes();
 
             res.sampleStart(); // Start timing
-            // send the batch of events to the event hub
-            //.send(batch);
-
-            sentBytes = batch.getSizeInBytes();
             res.latencyEnd();
 
             res.setDataType(SampleResult.TEXT);
@@ -168,9 +142,6 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
             responseMessage = ex.getMessage();
             log.error("Error calling {} sampler. ", threadName, ex);
         } finally {
-            if (producer != null) {
-                producer.close();
-            }
             res.setSamplerData(requestBody); // Request Body
             res.setBytes(bytes);
             res.setSentBytes(sentBytes);
