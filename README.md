@@ -37,6 +37,7 @@ you will need to add the following lines to your JMX file:
 ```xml
     <hashTree>
         <com.microsoft.eventhubplugin.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
+          <boolProp name="useManagedIdentity">false</boolProp>
           <stringProp name="eventHubConnectionVarName">EventHubConnectionString</stringProp>
           <stringProp name="eventHubName">telemetry-data-changed-eh</stringProp>
           <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
@@ -61,3 +62,24 @@ and [a liquid template](/samples/eventhubplugin/StreamingDataTemplate.liquid) fi
 
 After completing the JMX file and testing it using in GUI mode, upload the JMX file along with JAR file and the liquid template to Azure load test and
 then follow the steps provided [here](https://learn.microsoft.com/en-us/azure/load-testing/quickstart-create-and-run-load-test) to setup Azure load testing.
+
+#### How to enable Managed Identity in Azure Load Testing
+
+Using Managed Identity over Connection Strings is a best practice for enhanced security and manageability. Follow these steps to enable Managed Identity:
+
+1. Add the `useManagedIdentity` and `eventHubNamespace` properties to your JMX file:
+
+    ```xml
+        <hashTree>
+            <com.microsoft.eventhubplugin.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
+              <boolProp name="useManagedIdentity">true</boolProp>
+              <stringProp name="eventHubNamespace">telemetry-ehn.servicebus.windows.net</stringProp>
+              <stringProp name="eventHubName">telemetry-data-changed-eh</stringProp>
+              <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
+            </com.microsoft.eventhubplugin.EventHubPlugin>
+        <hashTree/>
+    ```
+
+1. [Assign an identity to your load testing resource](https://learn.microsoft.com/en-us/azure/load-testing/how-to-use-a-managed-identity?tabs=azure-portal) so it can send events to the target Event Hub using the `Azure Event Hubs Data Sender` role. Here is an example of how it looks after setting the role assignments:
+
+    ![managed-identity-assigned-roles.png](./assets/managed-identity-assigned-roles.png)

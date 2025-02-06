@@ -27,9 +27,9 @@
       </ThreadGroup>
       <hashTree>
         <com.microsoft.eventhubplugin.EventHubPlugin guiclass="com.microsoft.eventhubplugin.EventHubPluginGui" testclass="com.microsoft.eventhubplugin.EventHubPlugin" testname="Azure Event Hubs Sampler" enabled="true">
-          <boolProp name="useManagedIdentity">false</boolProp>
+          <boolProp name="useManagedIdentity">true</boolProp>
           <stringProp name="eventHubConnectionVarName">EventHubConnectionString</stringProp>
-          <stringProp name="eventHubNamespace">archdocjmeterloader</stringProp>
+          <stringProp name="eventHubNamespace">archdocjmeterloader.servicebus.windows.net</stringProp>
           <stringProp name="eventHubName">archdocsjmeter-eh</stringProp>
           <stringProp name="liquidTemplateFileName">StreamingDataTemplate.liquid</stringProp>
         </com.microsoft.eventhubplugin.EventHubPlugin>
