@@ -83,3 +83,5 @@ Using Managed Identity over Connection Strings is a best practice for enhanced s
 1. [Assign an identity to your load testing resource](https://learn.microsoft.com/en-us/azure/load-testing/how-to-use-a-managed-identity?tabs=azure-portal) so it can send events to the target Event Hub using the `Azure Event Hubs Data Sender` role. Here is an example of how it looks after setting the role assignments:
 
     ![managed-identity-assigned-roles.png](./assets/managed-identity-assigned-roles.png)
+
+1. When setting the test plan, make sure to select the engine identity as `System Managed Identity`.
