@@ -1,8 +1,6 @@
 package com.microsoft.eventhubplugin;
 
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -11,6 +9,7 @@ import org.apache.jmeter.samplers.AbstractSampler;
 import org.apache.jmeter.samplers.Entry;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.BooleanProperty;
 import org.apache.jmeter.testelement.property.StringProperty;
 import org.apache.jmeter.testelement.TestStateListener;
 
@@ -19,10 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import com.azure.messaging.eventhubs.*;
 import com.azure.messaging.eventhubs.models.CreateBatchOptions;
-import com.azure.core.amqp.exception.*;
+import com.azure.core.amqp.exception.AmqpException;
 import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.identity.ManagedIdentityCredential;
-import com.azure.identity.ManagedIdentityCredentialBuilder;
 
 public class EventHubPlugin extends AbstractSampler implements TestStateListener {
 
@@ -34,7 +31,9 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
 
     public static final String LIQUID_TEMPLATE_FILENAME = "liquidTemplateFileName";
     public static final String EVENT_HUB_CONNECTION_VAR_NAME = "eventHubConnectionVarName";
+    public static final String EVENT_HUB_NAMESPACE = "eventHubNamespace";
     public static final String EVENT_HUB_NAME = "eventHubName";
+    public static final String USE_MANAGED_IDENTITY = "useManagedIdentity";
 
     private MessageRenderer messageRenderer = null;
     private String templateFileName = null;
@@ -43,12 +42,28 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
         super();
     }
 
+    public void setUseManagedIdentity(boolean useManagedIdentity) {
+        setProperty(new BooleanProperty(USE_MANAGED_IDENTITY, useManagedIdentity));
+    }
+
+    public boolean getUseManagedIdentity() {
+        return getPropertyAsBoolean(USE_MANAGED_IDENTITY);
+    }
+
     public void setEventHubConnectionVarName(String eventHubConnectionVarName) {
         setProperty(new StringProperty(EVENT_HUB_CONNECTION_VAR_NAME, eventHubConnectionVarName));
     }
 
     public String getEventHubConnectionVarName() {
         return getPropertyAsString(EVENT_HUB_CONNECTION_VAR_NAME);
+    }
+
+    public void setEventHubNamespace(String eventHubNamespace) {
+        setProperty(new StringProperty(EVENT_HUB_NAMESPACE, eventHubNamespace));
+    }
+
+    public String getEventHubNamespace() {
+        return getPropertyAsString(EVENT_HUB_NAMESPACE);
     }
 
     public void setEventHubName(String eventHubName) {
@@ -92,33 +107,24 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
         EventHubClientBuilder producerBuilder = new EventHubClientBuilder();
 
         try {
-            String connectionStringVarName = getEventHubConnectionVarName();
-            requestBody = "EventHub Connection String Var Name: ".concat(connectionStringVarName);
+            if (getUseManagedIdentity()) {
+                requestBody = "EventHub Connection String: Using Managed Identity";
 
-            //System.setProperty("http.nonProxyHosts", "169.254.169.254");
-            log.error("calling System.getenv");
-            final String connectionString = System.getenv(connectionStringVarName);
+                log.info("Using Managed Identity for EventHub " + getEventHubNamespace() + "/" + getEventHubName());
 
-            if (connectionString == null) {
-                // Use managed identity
-                requestBody = requestBody.concat("\n")
-                    .concat("EventHub Connection String: ").concat("Using Managed Identity");
-
-                //producerBuilder.fullyQualifiedNamespace("archdocjmeterloader.servicebus.windows.net");
-                //producerBuilder.eventHubName(getEventHubName());
-                log.error("calling managed identity ");
-                // producerBuilder.credential(new ManagedIdentityCredentialBuilder()
-                //                                     //.resourceId("/subscriptions/88e95096-b275-4fb0-be07-a309aa0e98f1/resourceGroups/rg-arch-doc-jmeter-loader/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jmeter-loader-managed-identity")
-                //                                     .clientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301")
-                //                                     .build());
-                producerBuilder.credential("archdocjmeterloader.servicebus.windows.net",
+                producerBuilder.credential(getEventHubNamespace(),
                     getEventHubName(),
                     new DefaultAzureCredentialBuilder().build());
-                //producerBuilder.credential(new DefaultAzureCredentialBuilder().managedIdentityClientId("1b05ab34-39dc-4f6c-bbe0-36c90e051301").build());
-                log.error("called managed identity ");
             } else {
+                String connectionStringVarName = getEventHubConnectionVarName();
+                requestBody = "EventHub Connection String Var Name: ".concat(connectionStringVarName);
+    
+                final String connectionString = System.getenv(connectionStringVarName);
+
                 requestBody = requestBody.concat("\n")
                     .concat("EventHub Connection String: ").concat(connectionString);
+
+                    log.info("Using Connection String for EventHub " + getEventHubName());
 
                 producerBuilder = producerBuilder.connectionString(connectionString, getEventHubName());
             }
@@ -145,7 +151,8 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
 
             res.sampleStart(); // Start timing
             // send the batch of events to the event hub
-            //.send(batch);
+            producer.send(batch);
+            log.info("Request has been sent");
 
             sentBytes = batch.getSizeInBytes();
             res.latencyEnd();
@@ -156,7 +163,7 @@ public class EventHubPlugin extends AbstractSampler implements TestStateListener
             isSuccessful = true;
             res.sampleEnd(); // End timing
         } catch (AmqpException ex) {
-            log.info("Error calling {} sampler. ", threadName, ex);
+            log.error("Error calling {} sampler. ", threadName, ex);
             if (ex.isTransient()) {
                 responseMessage = "A transient error occurred in ".concat(threadName)
                         .concat(" sampler. Please try again later.\n");
